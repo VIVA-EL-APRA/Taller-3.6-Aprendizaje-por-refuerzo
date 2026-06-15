@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprendizaje por Refuerzo — Infografía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0D1B2A;
+    --navy2:   #1B2A4A;
+    --navy3:   #1E3A5F;
+    --blue:    #2563EB;
+    --cyan:    #06B6D4;
+    --teal:    #0D9488;
+    --sarsa:   #F97316;
+    --dqn:     #7C3AED;
+    --a2c:     #818CF8;
+    --qlearn:  #EC4899;
+    --green:   #22C55E;
+    --amber:   #F59E0B;
+    --red:     #EF4444;
+    --gray:    #94A3B8;
+    --light:   #E2E8F0;
+    --white:   #FFFFFF;
+    --card-bg: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.10);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--navy);
+    color: var(--light);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ───────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem 6rem;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(37,99,235,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 80% 20%, rgba(124,58,237,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(6,182,212,0.10) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(37,99,235,0.15);
+    border: 1px solid rgba(37,99,235,0.35);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: #93C5FD;
+    margin-bottom: 2rem;
+  }
+  .hero-badge span { width:6px; height:6px; border-radius:50%; background:#60A5FA; display:inline-block; }
+  .hero h1 {
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -.03em;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #fff 0%, #93C5FD 50%, #818CF8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    color: var(--gray);
+    max-width: 640px;
+    margin: 0 auto 3rem;
+    font-weight: 300;
+  }
+  .hero-chips {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    justify-content: center; margin-bottom: 4rem;
+  }
+  .chip {
+    padding: 6px 16px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    border: 1px solid;
+  }
+  .chip-blue  { background:rgba(37,99,235,.15); border-color:rgba(37,99,235,.4); color:#93C5FD; }
+  .chip-sarsa { background:rgba(249,115,22,.15); border-color:rgba(249,115,22,.4); color:#FED7AA; }
+  .chip-dqn   { background:rgba(124,58,237,.15); border-color:rgba(124,58,237,.4); color:#DDD6FE; }
+  .chip-a2c   { background:rgba(129,140,248,.15); border-color:rgba(129,140,248,.4); color:#C7D2FE; }
+  .chip-teal  { background:rgba(13,148,136,.15); border-color:rgba(13,148,136,.4); color:#99F6E4; }
+
+  /* ── SCROLL NAV ─────────────────────────────── */
+  .nav-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 4rem;
+  }
+  .nav-pill {
+    padding: 8px 20px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--gray);
+    text-decoration: none;
+    transition: all .2s;
+    cursor: pointer;
+  }
+  .nav-pill:hover { color: var(--white); border-color: rgba(255,255,255,.25); }
+
+  /* ── SECTION WRAPPER ─────────────────────────── */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: .75rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 1rem;
+  }
+  .section-desc {
+    font-size: 1rem; color: var(--gray);
+    max-width: 680px; margin-bottom: 3rem;
+    font-weight: 300;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--card-border);
+    margin: 0;
+  }
+
+  /* ── TIMELINE (árbol evolutivo) ──────────────── */
+  .timeline {
+    position: relative;
+    display: flex; flex-direction: column; gap: 0;
+    padding-left: 2rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--blue), var(--dqn), var(--sarsa), var(--a2c));
+    border-radius: 2px;
+  }
+  .tl-item {
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    padding: 1.5rem 1.5rem 1.5rem 2.5rem;
+    position: relative;
+    border-radius: 12px;
+    transition: background .2s;
+  }
+  .tl-item:hover { background: var(--card-bg); }
+  .tl-dot {
+    position: absolute; left: -2.25rem;
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--navy);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .tl-year {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    min-width: 40px; padding-top: 3px;
+  }
+  .tl-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .tl-content p  { font-size: 13px; color: var(--gray); line-height: 1.5; }
+  .tl-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: 2px 10px; border-radius: 999px;
+    margin-bottom: 6px;
+  }
+
+  /* ── ALGORITHM CARDS ─────────────────────────── */
+  .algo-section {
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+  .algo-header {
+    padding: 2rem 2.5rem 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .algo-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900;
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .algo-meta { flex: 1; min-width: 200px; }
+  .algo-meta h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 4px; }
+  .algo-meta .full-name { font-size: 13px; color: var(--gray); margin-bottom: 10px; }
+  .algo-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .algo-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px; border: 1px solid;
+  }
+  .algo-body { padding: 2rem 2.5rem; }
+  .algo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .info-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+  }
+  .info-card-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--gray); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .info-card-label .dot { width:6px; height:6px; border-radius:50%; display:inline-block; }
+  .info-card-value { font-size: 14px; font-weight: 500; line-height: 1.5; }
+  .info-card-value small { display:block; font-size:12px; color:var(--gray); font-weight:400; margin-top:3px; }
+
+  /* ── EQUATION BOX ─────────────────────────────── */
+  .equation {
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 1.2rem 1.6rem;
+    margin: 1.5rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .eq-label { font-size: 11px; color: var(--gray); margin-bottom: 6px; font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .eq-main { font-size: 15px; font-weight: 600; }
+  .hl-sarsa { color: #FED7AA; }
+  .hl-dqn   { color: #DDD6FE; }
+  .hl-a2c   { color: #C7D2FE; }
+  .hl-key   { color: #6EE7B7; }
+  .hl-amber { color: #FDE68A; }
+  .hl-cyan  { color: #A5F3FC; }
+
+  /* ── COMPARISON TABLE ────────────────────────── */
+  .comp-wrap { overflow-x: auto; margin: 2rem 0; }
+  .comp-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px; min-width: 650px;
+  }
+  .comp-table th {
+    padding: 12px 16px; text-align: left;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--gray);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .comp-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    vertical-align: middle;
+  }
+  .comp-table tr:hover td { background: var(--card-bg); }
+  .comp-table .algo-name { font-weight: 700; font-size: 14px; }
+  .badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .badge-green  { background:rgba(34,197,94,.15);  color:#86EFAC; }
+  .badge-amber  { background:rgba(245,158,11,.15);  color:#FDE68A; }
+  .badge-red    { background:rgba(239,68,68,.15);   color:#FCA5A5; }
+  .badge-blue   { background:rgba(37,99,235,.15);   color:#93C5FD; }
+  .badge-purple { background:rgba(124,58,237,.15);  color:#DDD6FE; }
+  .badge-orange { background:rgba(249,115,22,.15);  color:#FED7AA; }
+  .badge-teal   { background:rgba(13,148,136,.15);  color:#99F6E4; }
+  .badge-gray   { background:rgba(148,163,184,.15); color:#CBD5E1; }
+
+  /* ── KEY CONCEPT BOXES ───────────────────────── */
+  .concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem; margin: 2.5rem 0;
+  }
+  .concept-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .concept-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .concept-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .concept-card p  { font-size: 13px; color: var(--gray); line-height: 1.6; }
+  .concept-num {
+    font-size: 42px; font-weight: 900;
+    opacity: .06; position: absolute;
+    right: 1rem; bottom: .5rem;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+  }
+
+  /* ── FLOW DIAGRAM ─────────────────────────────── */
+  .flow-wrap {
+    display: flex; align-items: center;
+    gap: 0; flex-wrap: wrap;
+    margin: 2rem 0; justify-content: center;
+  }
+  .flow-step {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: .85rem 1.2rem;
+    text-align: center;
+    min-width: 90px;
+  }
+  .flow-step .step-letter {
+    font-size: 20px; font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+    display: block; margin-bottom: 4px;
+  }
+  .flow-step .step-desc { font-size: 10px; color: var(--gray); line-height: 1.3; }
+  .flow-arrow {
+    font-size: 18px; color: var(--gray);
+    padding: 0 .5rem; flex-shrink: 0;
+  }
+  .flow-update {
+    border-radius: 12px; border: 1px dashed;
+    padding: .85rem 1.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.7;
+    background: rgba(0,0,0,.3);
+    margin-top: 1.5rem; width: 100%;
+  }
+
+  /* ── INNOVATIONS (DQN) ───────────────────────── */
+  .innovations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem; margin: 2rem 0;
+  }
+  .innov-card {
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    padding: 1.5rem;
+    position: relative;
+  }
+  .innov-num {
+    width: 32px; height: 32px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    margin-bottom: 1rem;
+  }
+  .innov-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .innov-card p  { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
+  /* ── STAT ROW ─────────────────────────────────── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem; margin: 2rem 0;
+  }
+  .stat-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 2rem; font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+    display: block; line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label { font-size: 11px; color: var(--gray); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+
+  /* ── FOOTER ───────────────────────────────────── */
+  .footer {
+    border-top: 1px solid var(--card-border);
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--gray);
+    font-size: 13px;
+  }
+  .footer strong { color: var(--light); }
+  .footer-chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:1.5rem; }
+
+  /* ── RESPONSIVE ──────────────────────────────── */
+  @media (max-width: 640px) {
+    .algo-header { flex-direction: column; }
+    .flow-wrap   { gap: 6px; }
+    .flow-arrow  { display: none; }
+    .section     { padding: 3rem 1rem; }
+    .algo-body   { padding: 1.5rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section class="hero" id="top">
+  <div class="hero-badge"><span></span> Actividad Grupal · Machine Learning</div>
+  <h1>Aprendizaje<br>por Refuerzo</h1>
+  <p class="hero-sub">Una guía visual completa de los 4 algoritmos fundamentales: de tablas Q a redes neuronales profundas con agentes paralelos.</p>
+  <div class="hero-chips">
+    <span class="chip chip-teal">Q-Learning · Familia base</span>
+    <span class="chip chip-sarsa">SARSA · On-Policy</span>
+    <span class="chip chip-dqn">DQN · Deep RL</span>
+    <span class="chip chip-a2c">A3C / A2C · Paralelo</span>
+    <span class="chip chip-blue">Gymnasium · Python · PyTorch</span>
+  </div>
+  <nav class="nav-pills">
+    <a class="nav-pill" href="#fundamentos">Fundamentos</a>
+    <a class="nav-pill" href="#sarsa">SARSA</a>
+    <a class="nav-pill" href="#dqn">DQN</a>
+    <a class="nav-pill" href="#a2c">A3C / A2C</a>
+    <a class="nav-pill" href="#comparativa">Comparativa</a>
+    <a class="nav-pill" href="#conceptos">Conceptos clave</a>
+  </nav>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ FUNDAMENTOS ════════════════════ -->
+<section class="section" id="fundamentos">
+  <p class="section-label" style="color:var(--cyan)">01 · Fundamentos</p>
+  <h2 class="section-title">El árbol evolutivo del RL</h2>
+  <p class="section-desc">Cada algoritmo resolvió el problema de su predecesor. Esta línea de tiempo muestra por qué surgió cada uno y qué problema atacó.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--blue); border-color:var(--navy)"></div>
+      <div class="tl-year" style="color:var(--blue)">1989</div>
+      <div class="tl-content">
+        <span class="tl-tag" style="background:rgba(37,99,235,.15); color:#93C5FD;">Off-Policy · Tabular</span>
+        <h4>Q-Learning — el fundamento</h4>
+        <p>Chris Watkins publica Q-Learning. El agente aprende la política <em>óptima</em> usando una tabla Q(s,a). Actualiza con el máximo valor futuro, independientemente de lo que realmente hará. Funciona perfecto en entornos con pocos estados discretos. Limitación: la tabla explota con estados continuos o de alta dimensión (<em>maldición de la dimensionalidad</em>).</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--sarsa); border-color:var(--navy)"></div>
+      <div class="tl-year" style="color:var(--sarsa)">1994</div>
+      <div class="tl-content">
+        <span class="tl-tag" style="background:rgba(249,115,22,.15); color:#FED7AA;">On-Policy · Tabular</span>
+        <h4>SARSA — el algoritmo cauteloso</h4>
+        <p>Rummery & Niranjan introducen SARSA. A diferencia de Q-Learning, actualiza Q(s,a) usando la acción <em>real</em> que tomará a continuación (a'), no la mejor teórica. Esto lo hace más conservador: aprende a evitar los riesgos que comete durante la exploración. Ideal cuando los errores tienen costo real.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--dqn); border-color:var(--navy)"></div>
+      <div class="tl-year" style="color:var(--dqn)">2013</div>
+      <div class="tl-content">
+        <span class="tl-tag" style="background:rgba(124,58,237,.15); color:#DDD6FE;">Off-Policy · Deep RL</span>
+        <h4>DQN — Deep Mind conquista Atari</h4>
+        <p>DeepMind reemplaza la tabla por una red neuronal que aproxima Q(s,a) para cualquier estado. Dos innovaciones clave: <strong>Experience Replay</strong> (buffer de experiencias pasadas que rompe correlación temporal) y <strong>Target Network</strong> (red congelada que estabiliza el objetivo de aprendizaje). Supera a humanos en 49 juegos de Atari aprendiendo solo de píxeles.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--a2c); border-color:var(--navy)"></div>
+      <div class="tl-year" style="color:var(--a2c)">2016</div>
+      <div class="tl-content">
+        <span class="tl-tag" style="background:rgba(129,140,248,.15); color:#C7D2FE;">On-Policy · Paralelo · Actor-Crítico</span>
+        <h4>A3C / A2C — el poder del paralelismo</h4>
+        <p>DeepMind (A3C) y OpenAI (A2C) publican algoritmos Actor-Crítico con múltiples agentes en paralelo. Resuelven la correlación de datos sin necesitar replay buffer. A3C: workers asíncronos (CPU). A2C: workers síncronos (GPU). La <strong>Ventaja A(s,a) = G_t − V(s)</strong> combina lo mejor de policy gradient y value-based. Base conceptual de RLHF en ChatGPT.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ SARSA ══════════════════════════ -->
+<section class="section" id="sarsa">
+  <p class="section-label" style="color:var(--sarsa)">02 · SARSA</p>
+  <h2 class="section-title" style="color:var(--white)">State · Action · Reward · State · Action</h2>
+  <p class="section-desc">El algoritmo On-Policy más cauteloso. Aprende la política que realmente ejecuta, incluyendo sus propios errores de exploración.</p>
+
+  <div class="algo-section">
+    <div class="algo-header">
+      <div class="algo-icon" style="background:rgba(249,115,22,.15); color:#FED7AA;">S</div>
+      <div class="algo-meta">
+        <h2 style="color:#FED7AA">SARSA Tabular</h2>
+        <div class="full-name">State-Action-Reward-State-Action · Rummery & Niranjan, 1994</div>
+        <div class="algo-tags">
+          <span class="algo-tag" style="border-color:rgba(249,115,22,.4);color:#FED7AA;">On-Policy</span>
+          <span class="algo-tag" style="border-color:rgba(13,148,136,.4);color:#99F6E4;">Tabular</span>
+          <span class="algo-tag" style="border-color:rgba(245,158,11,.4);color:#FDE68A;">ε-greedy</span>
+          <span class="algo-tag" style="border-color:rgba(148,163,184,.4);color:#CBD5E1;">Taxi-v4</span>
+          <span class="algo-tag" style="border-color:rgba(148,163,184,.4);color:#CBD5E1;">Model-Free</span>
+        </div>
+      </div>
+      <div class="stats-row" style="margin:0; grid-template-columns:repeat(3,1fr); flex-shrink:0;">
+        <div class="stat-box">
+          <span class="stat-value" style="color:#FED7AA;">500</span>
+          <span class="stat-label">estados</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#FED7AA;">7.47</span>
+          <span class="stat-label">reward final</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#FED7AA;">5K</span>
+          <span class="stat-label">episodios</span>
+        </div>
+      </div>
+    </div>
+    <div class="algo-body">
+
+      <!-- Ciclo SARSA -->
+      <p style="font-size:12px;color:var(--gray);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem;">El ciclo del acrónimo</p>
+      <div class="flow-wrap">
+        <div class="flow-step">
+          <span class="step-letter" style="color:#FED7AA;">S</span>
+          <span class="step-desc">Estado<br>actual s</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-letter" style="color:#93C5FD;">A</span>
+          <span class="step-desc">Acción a<br>ε-greedy</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-letter" style="color:#FDE68A;">R</span>
+          <span class="step-desc">Recompensa<br>del entorno</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <span class="step-letter" style="color:#99F6E4;">S'</span>
+          <span class="step-desc">Nuevo<br>estado</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.08)">
+          <span class="step-letter" style="color:#FED7AA;">A'</span>
+          <span class="step-desc">Próxima<br>acción ★</span>
+        </div>
+        <div class="flow-update" style="border-color:rgba(249,115,22,.35)">
+          <span style="color:var(--gray);font-size:10px;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Actualización SARSA</span><br>
+          <span class="hl-sarsa">Q(s,a)</span> ← <span class="hl-sarsa">Q(s,a)</span> + <span class="hl-amber">α</span> · [ <span class="hl-key">r</span> + <span class="hl-amber">γ</span> · <span class="hl-sarsa">Q(s', <strong>a'</strong>)</span> − <span class="hl-sarsa">Q(s,a)</span> ]<br>
+          <span style="color:var(--gray);font-size:12px;">donde <strong>a'</strong> es la acción que el agente realmente tomará (On-Policy) — NO el máximo teórico</span>
+        </div>
+      </div>
+
+      <div class="algo-grid">
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--sarsa)"></span>Entorno</div>
+          <div class="info-card-value">Taxi-v4
+            <small>500 estados · 6 acciones · R=+20 entrega / R=−10 ilegal / R=−1 por paso</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--amber)"></span>Hiperparámetros</div>
+          <div class="info-card-value">α=0.1 · γ=0.99
+            <small>ε: 1.0 → 0.01 · decay ×0.999/episodio · Q-Table 500×6</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--green)"></span>Convergencia</div>
+          <div class="info-card-value">Episodio ~3,587
+            <small>Prom-100 final: 7.47 · Umbral resuelto: ≥7 pts</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--cyan)"></span>Exploración</div>
+          <div class="info-card-value">ε-greedy decreciente
+            <small>On-Policy: los errores ε se registran en Q(s,a). Aprende rutas seguras alejadas de penalizaciones.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diferencia clave vs Q-Learning -->
+      <div class="innovations" style="margin-top:0;">
+        <div class="innov-card" style="background:rgba(249,115,22,.06); border-color:rgba(249,115,22,.3);">
+          <div class="innov-num" style="background:rgba(249,115,22,.2); color:#FED7AA;">★</div>
+          <h4 style="color:#FED7AA;">SARSA — On-Policy</h4>
+          <p>Objetivo = r + γ · Q(s', <strong>a_ε-greedy</strong>)<br><br>
+          a' se elige con ε-greedy ANTES de actualizar. Si el agente explora y elige una acción mala, Q aprende que esa ruta ES peligrosa. <strong>Resultado: política conservadora</strong> que evita acantilados y penalizaciones.</p>
+        </div>
+        <div class="innov-card" style="background:rgba(148,163,184,.04); border-color:rgba(148,163,184,.2);">
+          <div class="innov-num" style="background:rgba(148,163,184,.15); color:var(--gray);">≠</div>
+          <h4>Q-Learning — Off-Policy</h4>
+          <p>Objetivo = r + γ · <strong>max_a'</strong> Q(s', a')<br><br>
+          El objetivo siempre asume que se tomará la mejor acción teórica, aunque luego ε provoque exploración. Es optimista: aprende la política óptima pero puede ser más arriesgado durante el entrenamiento.</p>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--gray);margin-top:.5rem;font-style:italic;">Ejemplo: en el Cliff Walking (acantilado), SARSA aprende a rodear el borde porque sabe que ε puede hacerlo caer. Q-Learning aprende el camino óptimo junto al borde, pero cae durante exploración.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ DQN ════════════════════════════ -->
+<section class="section" id="dqn">
+  <p class="section-label" style="color:var(--dqn)">03 · DQN</p>
+  <h2 class="section-title">Deep Q-Network</h2>
+  <p class="section-desc">DeepMind 2013. Reemplaza la tabla por una red neuronal. Supera el rendimiento humano en 49 juegos de Atari aprendiendo solo de píxeles.</p>
+
+  <div class="algo-section">
+    <div class="algo-header">
+      <div class="algo-icon" style="background:rgba(124,58,237,.2); color:#DDD6FE;">Q</div>
+      <div class="algo-meta">
+        <h2 style="color:#DDD6FE">Deep Q-Network</h2>
+        <div class="full-name">DQN · DeepMind · Mnih et al., Nature 2015</div>
+        <div class="algo-tags">
+          <span class="algo-tag" style="border-color:rgba(124,58,237,.4);color:#DDD6FE;">Off-Policy</span>
+          <span class="algo-tag" style="border-color:rgba(6,182,212,.4);color:#A5F3FC;">Exp. Replay</span>
+          <span class="algo-tag" style="border-color:rgba(249,115,22,.4);color:#FED7AA;">Target Net</span>
+          <span class="algo-tag" style="border-color:rgba(37,99,235,.4);color:#93C5FD;">CartPole-v1</span>
+          <span class="algo-tag" style="border-color:rgba(148,163,184,.4);color:#CBD5E1;">Basado en Valor</span>
+        </div>
+      </div>
+      <div class="stats-row" style="margin:0; grid-template-columns:repeat(3,1fr); flex-shrink:0;">
+        <div class="stat-box">
+          <span class="stat-value" style="color:#DDD6FE;">360</span>
+          <span class="stat-label">ep. conv.</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#DDD6FE;">208</span>
+          <span class="stat-label">reward final</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#DDD6FE;">20K</span>
+          <span class="stat-label">replay buf.</span>
+        </div>
+      </div>
+    </div>
+    <div class="algo-body">
+
+      <!-- Problema que resuelve -->
+      <div class="equation">
+        <div class="eq-label">El problema que DQN resuelve</div>
+        Q_tabla(s, a)  →  <span class="hl-dqn">Q_red(s; θ)</span><br>
+        <span style="color:var(--gray); font-size:12px;">La red neuronal con parámetros θ aproxima Q para CUALQUIER espacio de estados (incluso imágenes 210×160 px)</span>
+      </div>
+
+      <!-- Las 2 innovaciones -->
+      <p style="font-size:12px;color:var(--gray);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:1.5rem 0 1rem;">Las 2 innovaciones clave de DQN</p>
+      <div class="innovations">
+        <div class="innov-card" style="background:rgba(6,182,212,.06); border-color:rgba(6,182,212,.3);">
+          <div class="innov-num" style="background:rgba(6,182,212,.2); color:#A5F3FC;">1</div>
+          <h4 style="color:#A5F3FC;">Experience Replay</h4>
+          <p>Buffer circular de 20,000 transiciones (s, a, r, s', done). En cada paso se muestrea un mini-batch aleatorio de 64 experiencias pasadas para actualizar la red.<br><br>
+          <strong>¿Por qué?</strong> Las transiciones consecutivas están muy correlacionadas. Al mezclar experiencias aleatorias del pasado, la red ve una distribución uniforme de estados → aprendizaje estable y eficiente.</p>
+        </div>
+        <div class="innov-card" style="background:rgba(249,115,22,.06); border-color:rgba(249,115,22,.3);">
+          <div class="innov-num" style="background:rgba(249,115,22,.2); color:#FED7AA;">2</div>
+          <h4 style="color:#FED7AA;">Target Network (θ⁻)</h4>
+          <p>Copia congelada de la red Q que solo se sincroniza cada N episodios.<br><br>
+          <strong>¿Por qué?</strong> Sin ella, el objetivo de Bellman cambia en cada paso (objetivo "movedizo"). La Target Network actúa como diana fija → el aprendizaje converge. Se sincroniza: <code style="font-size:11px;">θ⁻ ← θ</code> cada 4 episodios.</p>
+        </div>
+      </div>
+
+      <!-- Ecuacion Bellman -->
+      <div class="equation">
+        <div class="eq-label">Ecuación de Bellman con Target Network</div>
+        <span class="eq-main">
+          <span class="hl-dqn">Q(s,a; θ)</span> ← <span class="hl-key">r</span> + <span class="hl-amber">γ</span> · <span style="color:#FED7AA">max_a'</span> <span class="hl-dqn">Q(s', a'; θ⁻)</span><br>
+          Loss = Huber_Loss( <span class="hl-dqn">Q(s,a;θ)</span> , objetivo_con_θ⁻ )
+        </span><br>
+        <span style="color:var(--gray);font-size:12px;">θ = parámetros de la red Q principal (actualiza cada paso) · θ⁻ = Target Network (congela N episodios)</span>
+      </div>
+
+      <div class="algo-grid">
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--dqn)"></span>Arquitectura</div>
+          <div class="info-card-value">FC(128) → ReLU → FC(128) → ReLU → FC(2)
+            <small>Input: 4 vars continuas · Output: Q(s,←) y Q(s,→)</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--cyan)"></span>Hiperparámetros</div>
+          <div class="info-card-value">lr=1e-3 · γ=0.99 · batch=64
+            <small>ε: 1.0 → 0.02 · decay ×0.992 · target update /4 ep</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--green)"></span>Resultado real</div>
+          <div class="info-card-value">Conv. ep. ~360 · prom-50: 208 pts
+            <small>CartPole resuelto (umbral 195). Pérdida Huber desciende gradualmente.</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--amber)"></span>Exploración</div>
+          <div class="info-card-value">ε-greedy Off-Policy
+            <small>Las exp. de exploración van al buffer. La actualización usa max Q (óptimo). Desacopla exploración del aprendizaje.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ A3C / A2C ══════════════════════ -->
+<section class="section" id="a2c">
+  <p class="section-label" style="color:var(--a2c)">04 · A3C / A2C</p>
+  <h2 class="section-title">Advantage Actor-Critic</h2>
+  <p class="section-desc">Múltiples agentes en paralelo, una red global. Resuelven la correlación de datos sin replay buffer. La base conceptual de RLHF en ChatGPT.</p>
+
+  <div class="algo-section">
+    <div class="algo-header">
+      <div class="algo-icon" style="background:rgba(129,140,248,.2); color:#C7D2FE;">A</div>
+      <div class="algo-meta">
+        <h2 style="color:#C7D2FE">A3C / A2C</h2>
+        <div class="full-name">Asynchronous / Synchronous Advantage Actor-Critic · DeepMind 2016 / OpenAI 2017</div>
+        <div class="algo-tags">
+          <span class="algo-tag" style="border-color:rgba(129,140,248,.4);color:#C7D2FE;">On-Policy</span>
+          <span class="algo-tag" style="border-color:rgba(13,148,136,.4);color:#99F6E4;">Actor-Crítico</span>
+          <span class="algo-tag" style="border-color:rgba(37,99,235,.4);color:#93C5FD;">Paralelo</span>
+          <span class="algo-tag" style="border-color:rgba(245,158,11,.4);color:#FDE68A;">CartPole-v1</span>
+        </div>
+      </div>
+      <div class="stats-row" style="margin:0; grid-template-columns:repeat(3,1fr); flex-shrink:0;">
+        <div class="stat-box">
+          <span class="stat-value" style="color:#C7D2FE;">8</span>
+          <span class="stat-label">workers</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#C7D2FE;">256</span>
+          <span class="stat-label">reward final</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" style="color:#C7D2FE;">4.7K</span>
+          <span class="stat-label">episodios</span>
+        </div>
+      </div>
+    </div>
+    <div class="algo-body">
+
+      <!-- A3C vs A2C -->
+      <div class="innovations">
+        <div class="innov-card" style="background:rgba(37,99,235,.06); border-color:rgba(37,99,235,.3);">
+          <div class="innov-num" style="background:rgba(37,99,235,.2); color:#93C5FD;">A3</div>
+          <h4 style="color:#93C5FD;">A3C — Asíncrono (2016)</h4>
+          <p>Múltiples workers actualizan la red global <strong>a su propio ritmo</strong>, sin esperar a los demás. Cada worker tiene su copia local de la red, recolecta experiencias y empuja gradientes al nodo global.<br><br>
+          ✓ Más rápido en CPU multicore<br>
+          ⚠ Gradientes pueden quedar obsoletos (<em>stale gradients</em>)</p>
+        </div>
+        <div class="innov-card" style="background:rgba(129,140,248,.06); border-color:rgba(129,140,248,.3);">
+          <div class="innov-num" style="background:rgba(129,140,248,.2); color:#C7D2FE;">A2</div>
+          <h4 style="color:#C7D2FE;">A2C — Síncrono (2017)</h4>
+          <p>Todos los workers recolectan N pasos y <strong>esperan</strong> a que todos terminen antes de actualizar en batch. Los gradientes siempre son frescos y consistentes.<br><br>
+          ✓ Gradientes frescos · Ideal para GPU<br>
+          ⚠ El worker más lento frena a todos</p>
+        </div>
+      </div>
+
+      <!-- Arquitectura Actor-Critico -->
+      <div class="equation">
+        <div class="eq-label">Red Actor-Crítico compartida</div>
+        Estado s → <span class="hl-cyan">Cuerpo FC(128)×2</span> → <span class="hl-a2c">ACTOR: logits → π(a|s)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘ <span class="hl-key">CRÍTICO: valor → V(s)</span><br><br>
+        <span class="hl-amber">Ventaja: A(s,a) = G_t − V(s)</span>  ← el corazón del algoritmo<br>
+        <span style="color:var(--gray);font-size:12px;">Si A > 0: la acción fue mejor de lo esperado → reforzar · Si A &lt; 0: peor → penalizar</span>
+      </div>
+
+      <!-- Perdidas -->
+      <div class="equation" style="margin-top:0;">
+        <div class="eq-label">Funciones de pérdida</div>
+        L_actor  = −E[ log <span class="hl-a2c">π(a|s)</span> · <span class="hl-amber">A(s,a)</span> ] − <span class="hl-key">β · H(π)</span>  ← bonus entropía<br>
+        L_critico = E[ (<span class="hl-key">G_t</span> − <span class="hl-key">V(s)</span>)² ]  ← MSE<br>
+        L_total  = L_actor + 0.5 · L_critico − <span class="hl-key">β · H(π)</span>
+      </div>
+
+      <div class="algo-grid">
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--a2c)"></span>Workers síncronos</div>
+          <div class="info-card-value">8 entornos paralelos
+            <small>gym.vector.SyncVectorEnv · 5 pasos/update · 8,000 actualizaciones totales</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--cyan)"></span>Exploración</div>
+          <div class="info-card-value">Bonus de Entropía β·H(π)
+            <small>No usa ε-greedy. La entropía en la pérdida penaliza distribuciones colapsadas → exploración continua.</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--green)"></span>Resultado real</div>
+          <div class="info-card-value">Prom-50: 256 pts · umbral ✓
+            <small>4,699 episodios totales. Sin replay buffer: la diversidad viene del paralelismo.</small>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label"><span class="dot" style="background:var(--amber)"></span>Casos de uso</div>
+          <div class="info-card-value">StarCraft II · ChatGPT/RLHF
+            <small>A2C es la base conceptual de RLHF (Reinforcement Learning from Human Feedback).</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ COMPARATIVA ════════════════════ -->
+<section class="section" id="comparativa">
+  <p class="section-label" style="color:var(--green)">05 · Comparativa</p>
+  <h2 class="section-title">Los 4 algoritmos cara a cara</h2>
+  <p class="section-desc">¿Cuándo usar cada uno? Esta tabla resume las diferencias fundamentales en política, arquitectura, exploración y casos de uso.</p>
+
+  <div class="comp-wrap">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Algoritmo</th>
+          <th>Política</th>
+          <th>Arquitectura</th>
+          <th>Entorno</th>
+          <th>Exploración</th>
+          <th>GPU</th>
+          <th>Resultado</th>
+          <th>Usar cuando…</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="algo-name" style="color:#93C5FD;">Q-Learning</span></td>
+          <td><span class="badge badge-purple">Off-Policy</span></td>
+          <td>Tabla Q</td>
+          <td>Discreto</td>
+          <td>ε-greedy</td>
+          <td><span class="badge badge-red">No</span></td>
+          <td>Referencia teórica</td>
+          <td>Pocos estados, sin costo de error</td>
+        </tr>
+        <tr>
+          <td><span class="algo-name" style="color:#FED7AA;">SARSA</span></td>
+          <td><span class="badge badge-orange">On-Policy</span></td>
+          <td>Tabla Q</td>
+          <td>Discreto</td>
+          <td>ε-greedy</td>
+          <td><span class="badge badge-red">No</span></td>
+          <td>Prom-100: <strong>7.47</strong> ✅</td>
+          <td>Error durante entrenamiento cuesta (robótica)</td>
+        </tr>
+        <tr>
+          <td><span class="algo-name" style="color:#DDD6FE;">DQN</span></td>
+          <td><span class="badge badge-purple">Off-Policy</span></td>
+          <td>Red neuronal + Replay + Target</td>
+          <td>Continuo</td>
+          <td>ε-greedy</td>
+          <td><span class="badge badge-amber">Media</span></td>
+          <td>Prom-50: <strong>208</strong> ✅</td>
+          <td>Estados continuos, acciones discretas</td>
+        </tr>
+        <tr>
+          <td><span class="algo-name" style="color:#C7D2FE;">A2C</span></td>
+          <td><span class="badge badge-orange">On-Policy</span></td>
+          <td>Actor-Crítico · N workers</td>
+          <td>Ambos</td>
+          <td>Entropía β·H(π)</td>
+          <td><span class="badge badge-green">Alta</span></td>
+          <td>Prom-50: <strong>256</strong> ✅</td>
+          <td>GPU disponible, máxima estabilidad</td>
+        </tr>
+        <tr>
+          <td><span class="algo-name" style="color:#86EFAC;">PPO</span></td>
+          <td><span class="badge badge-orange">On-Policy</span></td>
+          <td>Actor-Crítico · Clipped loss</td>
+          <td>Ambos</td>
+          <td>Entropía</td>
+          <td><span class="badge badge-green">Alta</span></td>
+          <td>ChatGPT · robots</td>
+          <td>Máxima estabilidad (sucesor de A2C)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Stats globales -->
+  <div class="stats-row" style="margin-top:3rem;">
+    <div class="stat-box">
+      <span class="stat-value" style="color:#FED7AA;">5,000</span>
+      <span class="stat-label">ep. SARSA Taxi</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" style="color:#DDD6FE;">500</span>
+      <span class="stat-label">ep. DQN CartPole</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" style="color:#C7D2FE;">4,699</span>
+      <span class="stat-label">ep. A2C (8 workers)</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" style="color:#A5F3FC;">195</span>
+      <span class="stat-label">umbral CartPole</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-value" style="color:#99F6E4;">3</span>
+      <span class="stat-label">frameworks Python</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ CONCEPTOS CLAVE ═══════════════ -->
+<section class="section" id="conceptos">
+  <p class="section-label" style="color:var(--amber)">06 · Conceptos clave</p>
+  <h2 class="section-title">Glosario visual del RL</h2>
+  <p class="section-desc">Los términos que aparecen en todos los algoritmos. Dominarlos es dominar el debate técnico de la rúbrica.</p>
+
+  <div class="concepts-grid">
+    <div class="concept-card" style="--accent:var(--blue)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--blue);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#93C5FD;">Proceso de Decisión de Markov (MDP)</h4>
+      <p>Marco matemático del RL. Define: <strong>S</strong> (estados), <strong>A</strong> (acciones), <strong>R</strong> (función de recompensa), <strong>γ</strong> (factor de descuento). Propiedad de Markov: el futuro solo depende del estado presente, no de la historia.</p>
+      <span class="concept-num">01</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--sarsa);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#FED7AA;">On-Policy vs Off-Policy</h4>
+      <p><strong>On-Policy</strong> (SARSA, A2C): aprende de la política que ejecuta. Los errores de exploración afectan al aprendizaje. Más cauteloso.<br>
+      <strong>Off-Policy</strong> (Q-Learning, DQN): aprende la política óptima teórica independientemente de lo que hace. Más eficiente en datos.</p>
+      <span class="concept-num">02</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#FDE68A;">Exploración vs Explotación</h4>
+      <p>Dilema fundamental: ¿probar acciones nuevas (explorar) o usar lo que ya sabe (explotar)?<br>
+      <strong>ε-greedy</strong>: aleatorio con prob ε, greedy con prob (1-ε). ε decae con el tiempo.<br>
+      <strong>Entropía H(π)</strong>: A2C añade β·H(π) a la pérdida para mantener distribución amplia.</p>
+      <span class="concept-num">03</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--dqn);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#DDD6FE;">Función de Valor Q(s,a)</h4>
+      <p>Valor esperado del retorno total al tomar la acción <em>a</em> en el estado <em>s</em> y seguir la política π. La Ecuación de Bellman es la recurrencia que permite calcularla iterativamente. DQN la aproxima con una red neuronal.</p>
+      <span class="concept-num">04</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--a2c);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#C7D2FE;">Ventaja A(s,a)</h4>
+      <p>A(s,a) = G_t − V(s). Mide si una acción fue <em>mejor</em> (+) o <em>peor</em> (-) de lo que el Crítico esperaba. Si A > 0 → reforzar la acción. Si A < 0 → penalizarla. Es el núcleo de A2C y PPO: reduce varianza sin introducir sesgo.</p>
+      <span class="concept-num">05</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#A5F3FC;">Experience Replay</h4>
+      <p>Buffer circular de transiciones (s, a, r, s', done). El agente muestrea mini-batches aleatorios para entrenar. Rompe la correlación temporal de experiencias consecutivas. Exclusivo de métodos Off-Policy (DQN). Los métodos On-Policy usan paralelismo en su lugar.</p>
+      <span class="concept-num">06</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--green);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#86EFAC;">Maldición de la Dimensionalidad</h4>
+      <p>El espacio de estados crece exponencialmente con el número de variables. Taxi-v4 tiene 500 estados (tabla manejable). CartPole tiene ∞ estados continuos (tabla imposible). Ahí entra DQN: la red neuronal generaliza entre estados similares sin necesitar memorizarlos todos.</p>
+      <span class="concept-num">07</span>
+    </div>
+    <div class="concept-card">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal);border-radius:16px 16px 0 0;"></div>
+      <h4 style="color:#99F6E4;">Ecuación de Bellman</h4>
+      <p>Q(s,a) = r + γ · max_a' Q(s', a'). La base de todos los algoritmos de RL. Expresa que el valor de una acción es la recompensa inmediata más el mejor valor futuro descontado. SARSA la modifica para usar a' real en lugar del máximo teórico.</p>
+      <span class="concept-num">08</span>
+    </div>
+  </div>
+
+  <!-- Aplicaciones del mundo real -->
+  <div style="margin-top:4rem;">
+    <p style="font-size:12px;color:var(--gray);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;">Aplicaciones del mundo real</p>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:1rem;">
+      <div class="info-card">
+        <div class="info-card-label"><span class="dot" style="background:var(--dqn)"></span>Google Data Centers</div>
+        <div class="info-card-value">DQN optimizó el enfriamiento<br><small>↓40% consumo energético · acciones discretas de válvulas</small></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label"><span class="dot" style="background:var(--a2c)"></span>ChatGPT / LLMs</div>
+        <div class="info-card-value">RLHF usa A2C conceptualmente<br><small>Múltiples respuestas → reward humano → Actor-Crítico</small></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label"><span class="dot" style="background:var(--a2c)"></span>AlphaStar (StarCraft II)</div>
+        <div class="info-card-value">A3C en millones de partidas<br><small>Nivel profesional sin conocimiento previo del juego</small></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label"><span class="dot" style="background:var(--sarsa)"></span>Robótica móvil</div>
+        <div class="info-card-value">SARSA para navegación segura<br><small>Aprende a evitar colisiones durante entrenamiento físico</small></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label"><span class="dot" style="background:var(--dqn)"></span>Juegos Atari (2013)</div>
+        <div class="info-card-value">DQN supera a humanos<br><small>49 de 57 juegos · aprendizaje solo de píxeles 210×160</small></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label"><span class="dot" style="background:var(--sarsa)"></span>Semáforos adaptativos</div>
+        <div class="info-card-value">SARSA para control de tráfico<br><small>Penalizaciones inmediatas → aprendizaje conservador</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════ FOOTER ═════════════════════════ -->
+<footer class="footer">
+  <p><strong>Aprendizaje por Refuerzo</strong> · Actividad Grupal — El Arte de Aprender de los Errores</p>
+  <p style="margin-top:.5rem;">Algoritmos implementados con <strong>Python 3.12</strong> · <strong>PyTorch</strong> · <strong>Gymnasium (Farama Foundation)</strong> · <strong>NumPy</strong> · <strong>Matplotlib</strong></p>
+  <div class="footer-chips">
+    <span class="chip chip-teal">SARSA · Taxi-v4 · prom-100: 7.47</span>
+    <span class="chip chip-dqn">DQN · CartPole-v1 · prom-50: 208 pts</span>
+    <span class="chip chip-a2c">A2C · CartPole-v1 · prom-50: 256 pts</span>
+  </div>
+  <p style="margin-top:1.5rem; font-size:12px; color:var(--gray);">Rúbrica: Modelado del Entorno · Simulación y Código · Estrategia de Exploración · Claridad y Debate Técnico</p>
+</footer>
+
+</body>
+</html>
